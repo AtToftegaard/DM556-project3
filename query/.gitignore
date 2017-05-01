@@ -1,0 +1,15 @@
+/Catalog.class
+/CreateIndex.class
+/CreateTable.class
+/Delete.class
+/Describe.class
+/DropIndex.class
+/DropTable.class
+/IndexDesc.class
+/Insert.class
+/Optimizer.class
+/Plan.class
+/QueryCheck.class
+/QueryException.class
+/Select.class
+/Update.class
