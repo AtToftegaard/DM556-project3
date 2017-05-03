@@ -311,13 +311,28 @@ public class Catalog implements GlobalConst {
 
   
   public void printInfo()
-  {
-	  System.out.println("Info from Catalog: So far nothing");
-	  System.out.println("This could also toggle an optimization flag");
-
-	  System.out.println("This method is called when TEST is written in the promt of Msql.java");
-	    
-	    
+  {	  
+	  //System.out.println(ATT_CAT + "\n" + "----------------------------");
+	  FileScan attscan = new FileScan(s_att, f_att);
+	  System.out.println("Tables and attributes with index \n ------------------------------");
+	  while (attscan.hasNext()){
+		  Tuple tup = attscan.getNext();
+		  if ((int) tup.getField(1) == 0){
+			  String tablename = (String) tup.getField("relName");
+			  Schema schema = getSchema(tablename);
+			  System.out.println(tablename);
+			  printschem(schema);
+		  }
+	  } 
   }
+
+private void printschem(Schema schema) {
+	int n = 0;
+	while (n < schema.getCount()){
+		System.out.print(schema.fieldName(n) + " index " + n + "; ");
+		++n;
+	}
+	System.out.println("\n");
+}
   
 } // public class Catalog implements GlobalConst

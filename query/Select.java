@@ -1,5 +1,7 @@
 package query;
 
+import java.util.ArrayList;
+
 import heap.HeapFile;
 import parser.AST_Select;
 import relop.FileScan;
@@ -55,6 +57,24 @@ class Select implements Plan {
 	int n = 1;
 	while (n < this.tableNames.length){
 		this.iter = new SimpleJoin(this.iter, new FileScan(this.schemas[n], new HeapFile(this.tableNames[n])), new Predicate[0]);
+		
+		ArrayList<Predicate[]> removepreds = new ArrayList<>();
+		for (Predicate[] pred : predicates){
+			Predicate[][] predi = new Predicate[1][pred.length];
+			predi[0] = pred;
+			if (isSelPossible(predi, this.iter)){
+				this.iter = new Selection(this.iter, pred);
+				removepreds.add(predi[0]);
+			}
+		}
+		Predicate[][] corrpreds = new Predicate[predicates.length-removepreds.size()][predicates[0].length];
+		
+		for (int i = 0; i<predicates.length; i++){
+			if (!removepreds.contains(predicates[i])){
+				corrpreds[i] = predicates[i];
+			}
+		}
+		predicates = corrpreds;
 		++n;
 	}
 	n = 0;
@@ -73,7 +93,16 @@ class Select implements Plan {
 	}
   }
 
-  private void select(AST_Select tree) throws QueryException {
+  private boolean isSelPossible(Predicate[][] predicates2, Iterator iter2) {
+	try {
+		QueryCheck.predicates(iter2.getSchema(), predicates2);
+	} catch (QueryException e) {
+		return false;
+	}
+	return true;
+}
+
+private void select(AST_Select tree) throws QueryException {
 	  
 	this.schema = new Schema(0);
 	this.tableNames = tree.getTables(); 
